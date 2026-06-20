@@ -1,4 +1,4 @@
-package com.kedarnath.notification_backend.Model;
+package com.kedarnath.notification_backend.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

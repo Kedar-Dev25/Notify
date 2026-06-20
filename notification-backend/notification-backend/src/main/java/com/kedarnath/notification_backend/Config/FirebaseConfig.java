@@ -1,4 +1,4 @@
-package com.kedarnath.notification_backend.Config;
+package com.kedarnath.notification_backend.config;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -13,7 +13,6 @@ public class FirebaseConfig {
 
     @PostConstruct
     public void init() throws Exception {
-
         InputStream serviceAccount =
                 getClass().getClassLoader().getResourceAsStream("serviceAccountKey.json");
 

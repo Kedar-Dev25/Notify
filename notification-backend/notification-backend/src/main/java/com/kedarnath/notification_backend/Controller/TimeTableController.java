@@ -1,9 +1,9 @@
-package com.kedarnath.notification_backend.Controller;
+package com.kedarnath.notification_backend.controller;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.kedarnath.notification_backend.Model.TimeTable;
-import com.kedarnath.notification_backend.Repository.TimeTableRepository;
+import com.kedarnath.notification_backend.model.TimeTable;
+import com.kedarnath.notification_backend.repository.TimeTableRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;

@@ -27,7 +27,7 @@ function Notify () {
      
       if(permission === "granted") {
           const token = await getToken(messaging,{
-          vapidKey : "BMvgovbU4luEPb7DJvnLr3l4_0oBlhqJlTXkRU7zHdZUam1mnt5rs0l9so8Uu7YxuPHYow1jt4XkyD-wFRp7lOg"
+          vapidKey : "BCOu_Siv0g6ymwBgP-OjyeMATDgbkyu66NlALy2kkRrlK3uRqQJYWfBOwBqs65IjN8UlY553TV7JP-DekEWp7T0"
         })
         await axios.post("http://localhost:8090/student",{
           branch  : data.branch,
