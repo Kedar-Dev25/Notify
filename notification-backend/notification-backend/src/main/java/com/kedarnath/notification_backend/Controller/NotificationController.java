@@ -1,27 +1,25 @@
 package com.kedarnath.notification_backend.controller;
 
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.MulticastMessage;
-import com.google.firebase.messaging.Notification;
 import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
+import com.kedarnath.notification_backend.model.Student;
+import com.kedarnath.notification_backend.model.TimeTable;
 import com.kedarnath.notification_backend.repository.StudentRepository;
 import com.kedarnath.notification_backend.repository.TimeTableRepository;
-import com.kedarnath.notification_backend.model.TimeTable;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.format.TextStyle;
+import java.time.LocalTime;
 import java.util.List;
-import java.util.Locale;
 
 @RestController
 @RequestMapping("/test")
+@EnableScheduling
 public class NotificationController {
 
     @Autowired
@@ -30,22 +28,54 @@ public class NotificationController {
     @Autowired
     private StudentRepository studentRepository;
 
-    @GetMapping("/send")
-public String sendNotification() throws Exception {
+    // OPTIONAL TEST API
+    @PostMapping("/add-timetable")
+    public String addTimeTable(@RequestBody TimeTable t) {
+        timeTableRepository.save(t);
+        return "Saved timetable";
+    }
 
-    String token = "fo814PI257s7duJwtrRSgy:APA91bGY5o6LybQnvKy-qNAYvAnUWw0nwgXw5TyJFLs9OC2KyPzWl2PqoyHCcXMXHHSuAStyyL-lW2W4x4d223i0ps2AYNS5jh4INC8fX7j42AaMGsTn908";
-    System.out.println("Token is : "+ token);
+    // 🔥 MAIN SCHEDULER
+    @Scheduled(fixedRate = 60000)
+    public void sendScheduledNotifications() {
 
-    Message message = Message.builder()
-            .setToken(token)
-            .setNotification(Notification.builder()
-                    .setTitle("TEST 🚀")
-                    .setBody("Direct hit notification working!")
-                    .build())
-            .build();
+        String today = LocalDate.now()
+                .getDayOfWeek()
+                .name();
 
-    String response = FirebaseMessaging.getInstance().send(message);
+        String now = LocalTime.now()
+                .withSecond(0)
+                .withNano(0)
+                .toString();
 
-    return "Sent: " + response;
-}
+        List<TimeTable> list =
+                timeTableRepository.findByTimeAndWeek(now, today);
+
+        for (TimeTable t : list) {
+
+            List<Student> students =
+                    studentRepository.findByBranchAndSemester(
+                            t.getBranch(),
+                            t.getSemester()
+                    );
+
+            for (Student s : students) {
+
+                try {
+                    Message message = Message.builder()
+                            .setToken(s.getFcmToken())
+                            .setNotification(Notification.builder()
+                                    .setTitle(t.getSubject())
+                                    .setBody("Class at " + t.getTime())
+                                    .build())
+                            .build();
+
+                    FirebaseMessaging.getInstance().send(message);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }

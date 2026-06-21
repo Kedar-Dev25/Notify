@@ -42,12 +42,13 @@ export default function Admin() {
        <select
        value={formData2.week}
        onChange={(e) =>{setFormData2({...formData2, week : e.target.value})}}>
-        <option value="Monday">Monday</option>
-        <option value="Tuesday">Tuesday</option>
-        <option value="Wednesday">Wednesday</option>
-        <option value="Thursdary">Thursdary</option>
-        <option value="Friday">Friday</option>
-        <option value="Saturday">Saturday</option>
+        <option value="MONDAY">MONDAY</option>
+        <option value="TUESDAY">TUESDAY</option>
+        <option value="WEDNESDAY">WEDNESDAY</option>
+        <option value="THURSDAY">THURSDAY</option>
+        <option value="FRIDAY">FRIDAY</option>
+        <option value="SATURDAY">SATURDAY</option>
+        <option value="SUNDAY">SUNDAY</option>
        </select>
        Subject :
        <input type="text" onChange = {(e) =>{setFormData2({...formData2,subject: e.target.value})}}placeholder="Enter Subject Name Here" required/>
