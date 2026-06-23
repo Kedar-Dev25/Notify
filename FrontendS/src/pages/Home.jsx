@@ -41,7 +41,8 @@ function Home() {
             <option value="3RD">3rd</option>
             <option value="4TH">4th</option>
             <option value="5TH">5th</option>
-]       <button onClick={
+            </select>
+       <button onClick={
         () => navigate("/notification",
         {state:formData})}
         disabled = {!formData.branch || !formData.semester}>Next</button>
