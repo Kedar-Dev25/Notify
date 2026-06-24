@@ -8,6 +8,5 @@ import java.util.List;                                     // <-- Missing Import
 
 public interface StudentRepository extends JpaRepository<Student, Long> {
     
-    @Query("SELECT s.fcmToken FROM Student s WHERE s.branch = :branch AND s.semester = :sem")
-    List<String> findTokensByBranchAndSemester(@Param("branch") String branch, @Param("sem") String sem);
+List<Student> findByBranchAndSemester(String branch, String semester);
 }

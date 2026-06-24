@@ -3,7 +3,9 @@ package com.kedarnath.notification_backend.controller;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
+import com.kedarnath.notification_backend.model.Student;
 import com.kedarnath.notification_backend.model.TimeTable;
+import com.kedarnath.notification_backend.repository.StudentRepository;
 import com.kedarnath.notification_backend.repository.TimeTableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -21,11 +23,11 @@ public class NotificationController {
 
     @Autowired
     private TimeTableRepository timeTableRepository;
-
-    private static final String FCM_TOKEN = "fo814PI257s7duJwtrRSgy:APA91bGY5o6LybQnvKy-qNAYvAnUWw0nwgXw5TyJFLs9OC2KyPzWl2PqoyHCcXMXHHSuAStyyL-lW2W4x4d223i0ps2AYNS5jh4INC8fX7j42AaMGsTn908";
+    @Autowired
+    private StudentRepository studentRepository;
 
     @Scheduled(fixedRate = 60000)
-    public void sendNotification() throws Exception {
+    public void sendNotification() {
 
         String currentTime = LocalTime.now()
                 .withSecond(0)
@@ -36,27 +38,65 @@ public class NotificationController {
                 .getDayOfWeek()
                 .toString();
 
+        System.out.println("CURRENT TIME = " + currentTime);
+        System.out.println("CURRENT WEEK = " + currentWeek);
+
         List<TimeTable> classes =
                 timeTableRepository.findByTimeAndWeek(currentTime, currentWeek);
-        System.out.println("FCM Token = " + FCM_TOKEN);
-        System.out.println("Classes found = " + classes.size());
-                if (!classes.isEmpty()) {
 
-            TimeTable tt = classes.get(0);
+        System.out.println("CLASSES FOUND = " + classes.size());
 
-            Message message = Message.builder()
-                    .setToken(FCM_TOKEN)
-                    .setNotification(
-                            Notification.builder()
-                                    .setTitle("Class Reminder")
-                                    .setBody(tt.getSubject() + " starts now!")
-                                    .build()
-                    )
-                    .build();
-
-            FirebaseMessaging.getInstance().send(message);
-
-            System.out.println("Notification Sent!");
+        if (classes.isEmpty()) {
+            System.out.println("NO CLASS MATCHED ❌");
+            return;
         }
+
+        for (TimeTable tt : classes) {
+
+            System.out.println("CLASS = " + tt.getSubject());
+            System.out.println("BRANCH = " + tt.getBranch());
+            System.out.println("SEMESTER = " + tt.getSemester());
+
+            List<Student> students =
+                    studentRepository.findByBranchAndSemester(
+                            tt.getBranch(),
+                            tt.getSemester()
+                    );
+
+            System.out.println("STUDENTS FOUND = " + students.size());
+
+            for (Student student : students) {
+
+                System.out.println("STUDENT ID = " + student.getId());
+                System.out.println("FCM TOKEN = " + student.getFcmToken());
+
+                if (student.getFcmToken() == null || student.getFcmToken().isEmpty()) {
+                    System.out.println("SKIPPED DUE TO EMPTY TOKEN");
+                    continue;
+                }
+
+                Message message = Message.builder()
+                        .setToken(student.getFcmToken())
+                        .setNotification(
+                                Notification.builder()
+                                        .setTitle("Class Reminder")
+                                        .setBody(tt.getSubject() + " starts now!")
+                                        .build()
+                        )
+                        .build();
+
+                try {
+                    String response =
+                            FirebaseMessaging.getInstance().send(message);
+
+                    System.out.println("FCM RESPONSE = " + response);
+
+                } catch (Exception e) {
+                    System.out.println("FAILED FOR STUDENT = " + student.getId());
+                }
+            }
+        }
+
+        System.out.println("NOTIFICATION LOOP COMPLETED ✅");
     }
 }
