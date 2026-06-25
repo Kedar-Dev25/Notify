@@ -4,6 +4,7 @@ import { useState } from "react";
 import Admin from "../componenet/Admin";
 
 function Home() {
+
     const navigate = useNavigate();
     const [formData,setFormData] = useState({
         branch : "",

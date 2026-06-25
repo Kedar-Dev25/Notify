@@ -1,11 +1,9 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getMessaging } from "firebase/messaging";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// NEW IMPORTS
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+
 const firebaseConfig = {
   apiKey: "AIzaSyD7u5XXJr1k4n2GMseEWlu7ynVjUrV8Jrk",
   authDomain: "notify-379bc.firebaseapp.com",
@@ -16,6 +14,10 @@ const firebaseConfig = {
   measurementId: "G-83XLLFL5DL"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
 export const messaging = getMessaging(app);
+
+// NEW
+export const auth = getAuth(app);
+export const provider = new GoogleAuthProvider();

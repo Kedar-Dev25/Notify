@@ -9,7 +9,9 @@ import { messaging } from "../firebase";
 
 function Notify () {
    const [mode,setMode] = useState(false);
-
+  if (!localStorage.getItem("user-email")) {
+    navigate("/auth");
+}
    const location = useLocation();
    const data = location.state;
    
@@ -20,8 +22,6 @@ function Notify () {
    }
 
 
-
-
    const handleNotify = async () =>{
      const permission = await Notification.requestPermission();
      
@@ -29,22 +29,17 @@ function Notify () {
           const token = await getToken(messaging,{
           vapidKey : "BCOu_Siv0g6ymwBgP-OjyeMATDgbkyu66NlALy2kkRrlK3uRqQJYWfBOwBqs65IjN8UlY553TV7JP-DekEWp7T0"
         })
+        const userEmail = localStorage.getItem("email")
         await axios.post("http://localhost:8090/student",{
           branch  : data.branch,
           semester : data.semester,
-          fcmToken : token
+          fcmToken : token,
+          email : userEmail
         })
         console.log(token)
         console.log("Token frontend se chala gaya bhia");
       }
    }
-
-
-
-
-
-
-
 
 
      return(
