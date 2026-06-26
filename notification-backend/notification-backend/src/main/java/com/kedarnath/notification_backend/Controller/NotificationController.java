@@ -1,5 +1,13 @@
 package com.kedarnath.notification_backend.controller;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
@@ -7,12 +15,6 @@ import com.kedarnath.notification_backend.model.Student;
 import com.kedarnath.notification_backend.model.TimeTable;
 import com.kedarnath.notification_backend.repository.StudentRepository;
 import com.kedarnath.notification_backend.repository.TimeTableRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -27,8 +29,9 @@ public class NotificationController {
     // 🔥 EXTERNAL TRIGGER ENDPOINT (GitHub Actions / Cron will call this)
     @GetMapping("/send-notification")
     public String sendNotification() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        String now = LocalTime.now().format(formatter);
 
-        LocalTime now = LocalTime.now();
         String currentWeek = LocalDate.now().getDayOfWeek().toString();
 
         System.out.println("CURRENT TIME = " + now);

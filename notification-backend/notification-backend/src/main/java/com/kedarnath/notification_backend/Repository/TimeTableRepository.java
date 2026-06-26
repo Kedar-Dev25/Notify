@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface TimeTableRepository extends JpaRepository<TimeTable, Long> {
     List<TimeTable> findByTimeAndWeek(String time, String week);
+    
 }
