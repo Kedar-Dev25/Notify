@@ -1,5 +1,5 @@
 package com.kedarnath.notification_backend.model;
-
+import java.time.LocalTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,7 +16,7 @@ public class TimeTable {
     private String semester;
     private String week;
     private String subject;
-    private String time;
+    private LocalTime time;
 
     public Long getId() {
     return id;
