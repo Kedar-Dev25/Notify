@@ -12,7 +12,7 @@ export default function Admin() {
 });
  
   const handleSave = () =>{
-    axios.post("http://localhost:8090/save-timetable",formData2);
+    axios.post("https://notify-x8o4.onrender.com/save-timetable",formData2);
   }
   console.log(typeof formData2.time);
   return(

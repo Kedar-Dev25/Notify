@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import Home from "./pages/home";
+import Home from "./pages/Home";
 import Notify from "./pages/Notify";
 import Auth from "./pages/Auth";
 import ProtectedRoute from "./componenet/ProtectedRoute";

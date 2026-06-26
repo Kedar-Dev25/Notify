@@ -1,13 +1,13 @@
-import { signInWithRedirect } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../firebase";
 
 function Auth() {
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user;
 
-      const email = user.email;
+      const email = result.user.email;
+
       localStorage.setItem("user-email", email);
 
       console.log("Saved Email:", email);
@@ -17,132 +17,228 @@ function Auth() {
   };
 
   return (
-    <div style={styles.wrapper}>
+    <div style={styles.container}>
+      <div style={styles.overlay}></div>
 
-      <div style={styles.leftPanel}>
-        <h1 style={styles.brand}>Notify</h1>
-        <p style={styles.tagline}>
-          Smart timetable notifications for students
+      <div style={styles.leftSection}>
+        <div style={styles.logoContainer}>
+          <div style={styles.logo}>N</div>
+          <span style={styles.logoText}>Notify</span>
+        </div>
+
+        <h1 style={styles.heading}>
+          Never Miss
+          <br />
+          Another Class.
+        </h1>
+
+        <p style={styles.description}>
+          Smart timetable notifications that automatically remind students
+          about upcoming lectures, labs, and academic schedules.
         </p>
 
-        <div style={styles.featureBox}>
-          <p>📌 Instant alerts</p>
-          <p>📅 Automated schedule tracking</p>
-          <p>🔔 Real-time notifications</p>
+        <div style={styles.features}>
+          <div style={styles.feature}>⚡ Instant Notifications</div>
+          <div style={styles.feature}>📅 Automated Schedule Tracking</div>
+          <div style={styles.feature}>🔔 Firebase Push Alerts</div>
+          <div style={styles.feature}>🎓 Student Focused</div>
         </div>
       </div>
 
-      <div style={styles.rightPanel}>
+      <div style={styles.rightSection}>
         <div style={styles.card}>
-          <h2 style={styles.title}>Welcome Back</h2>
+          <div style={styles.cardGlow}></div>
 
-          <p style={styles.subtitle}>
-            Sign in to continue
+          <h2 style={styles.cardTitle}>Welcome Back</h2>
+
+          <p style={styles.cardSubtitle}>
+            Continue with your college account
           </p>
 
-          <button onClick={handleGoogleLogin} style={styles.button}>
+          <button
+            style={styles.googleButton}
+            onClick={handleGoogleLogin}
+          >
+            <span style={styles.googleIcon}>G</span>
             Continue with Google
           </button>
 
-          <p style={styles.footer}>
-            Secure login via Google Authentication
+          <p style={styles.privacy}>
+            Secure authentication powered by Google
           </p>
         </div>
       </div>
-
     </div>
   );
 }
 
 const styles = {
-  wrapper: {
-    height: "100vh",
-    width: "100%",        // ❌ removed 100vw (IMPORTANT FIX)
+  container: {
+    minHeight: "100vh",
+    width: "100%",
     display: "flex",
-    overflow: "hidden",
-    fontFamily: "Arial, sans-serif",
-    background: "#0f172a",
+    flexWrap: "wrap",
+    background:
+      "linear-gradient(135deg,#020617,#0f172a,#111827)",
     color: "white",
+    position: "relative",
+    overflow: "hidden",
+    fontFamily:
+      "'Inter', 'Segoe UI', sans-serif",
   },
 
-  leftPanel: {
+  overlay: {
+    position: "absolute",
+    inset: 0,
+    background:
+      "radial-gradient(circle at top left, rgba(59,130,246,0.15), transparent 40%), radial-gradient(circle at bottom right, rgba(139,92,246,0.15), transparent 40%)",
+    pointerEvents: "none",
+  },
+
+  leftSection: {
     flex: 1,
+    minWidth: "320px",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    padding: "40px",      // reduced padding (prevents overflow)
-    background: "linear-gradient(135deg, #0f172a, #111827)",
-    minWidth: 0           // 🔥 FIX FLEX OVERFLOW
+    padding: "60px",
+    zIndex: 2,
   },
 
-  rightPanel: {
+  rightSection: {
     flex: 1,
+    minWidth: "320px",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "#0b1220",
-    minWidth: 0           // 🔥 FIX FLEX OVERFLOW
+    padding: "40px",
+    zIndex: 2,
+  },
+
+  logoContainer: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    marginBottom: "40px",
+  },
+
+  logo: {
+    width: "42px",
+    height: "42px",
+    borderRadius: "12px",
+    background:
+      "linear-gradient(135deg,#2563eb,#7c3aed)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontWeight: "bold",
+    fontSize: "20px",
+  },
+
+  logoText: {
+    fontSize: "24px",
+    fontWeight: "700",
+  },
+
+  heading: {
+    fontSize: "clamp(42px, 6vw, 72px)",
+    lineHeight: "1.05",
+    marginBottom: "20px",
+    fontWeight: "800",
+    letterSpacing: "-2px",
+  },
+
+  description: {
+    maxWidth: "550px",
+    color: "#94a3b8",
+    fontSize: "18px",
+    lineHeight: "1.8",
+    marginBottom: "40px",
+  },
+
+  features: {
+    display: "grid",
+    gap: "15px",
+  },
+
+  feature: {
+    color: "#cbd5e1",
+    fontSize: "15px",
   },
 
   card: {
-    width: "90%",
-    maxWidth: "360px",
-    padding: "30px",
-    borderRadius: "16px",
-    backgroundColor: "#111827",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
-    textAlign: "center",
-    border: "1px solid #1f2937",
-  },
-
-  brand: {
-    fontSize: "44px",
-    color: "#60a5fa",
-    marginBottom: "10px",
-  },
-
-  tagline: {
-    fontSize: "16px",
-    color: "#cbd5e1",
-    marginBottom: "25px",
-  },
-
-  featureBox: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px",
-    fontSize: "14px",
-    color: "#94a3b8",
-  },
-
-  title: {
-    fontSize: "24px",
-    marginBottom: "8px",
-    color: "#60a5fa",
-  },
-
-  subtitle: {
-    fontSize: "13px",
-    marginBottom: "20px",
-    color: "#94a3b8",
-  },
-
-  button: {
     width: "100%",
-    padding: "12px",
-    backgroundColor: "#2563eb",
-    border: "none",
-    borderRadius: "10px",
-    color: "white",
+    maxWidth: "420px",
+    position: "relative",
+    padding: "45px",
+    borderRadius: "28px",
+    backdropFilter: "blur(20px)",
+    background: "rgba(17,24,39,0.75)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    boxShadow:
+      "0 20px 60px rgba(0,0,0,0.5)",
+    textAlign: "center",
+  },
+
+  cardGlow: {
+    position: "absolute",
+    top: "-50px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: "150px",
+    height: "150px",
+    borderRadius: "50%",
+    background:
+      "rgba(59,130,246,0.15)",
+    filter: "blur(50px)",
+  },
+
+  cardTitle: {
+    fontSize: "32px",
+    marginBottom: "12px",
+    fontWeight: "700",
+  },
+
+  cardSubtitle: {
+    color: "#94a3b8",
+    marginBottom: "35px",
     fontSize: "15px",
+  },
+
+  googleButton: {
+    width: "100%",
+    height: "56px",
+    border: "none",
+    borderRadius: "14px",
     cursor: "pointer",
+    background:
+      "linear-gradient(135deg,#2563eb,#4f46e5)",
+    color: "white",
+    fontWeight: "600",
+    fontSize: "15px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "12px",
+    transition: "0.3s",
+  },
+
+  googleIcon: {
+    width: "26px",
+    height: "26px",
+    borderRadius: "50%",
+    background: "white",
+    color: "#2563eb",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     fontWeight: "bold",
   },
 
-  footer: {
-    marginTop: "12px",
-    fontSize: "11px",
+  privacy: {
+    marginTop: "20px",
     color: "#64748b",
+    fontSize: "13px",
   },
 };
 
