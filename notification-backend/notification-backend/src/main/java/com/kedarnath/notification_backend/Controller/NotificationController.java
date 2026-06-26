@@ -8,84 +8,77 @@ import com.kedarnath.notification_backend.model.TimeTable;
 import com.kedarnath.notification_backend.repository.StudentRepository;
 import com.kedarnath.notification_backend.repository.TimeTableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
 @RestController
-@EnableScheduling
+@RequestMapping("/api")
 public class NotificationController {
 
     @Autowired
     private TimeTableRepository timeTableRepository;
+
     @Autowired
     private StudentRepository studentRepository;
 
-    @Scheduled(cron = "0 * * * * *")
-public void sendNotification() {
+    // 🔥 EXTERNAL TRIGGER ENDPOINT (GitHub Actions / Cron will call this)
+    @GetMapping("/send-notification")
+    public String sendNotification() {
 
-    LocalTime now = LocalTime.now().withSecond(0).withNano(0);
-    String currentWeek = LocalDate.now().getDayOfWeek().toString();
-    String currentTime = now.toString();
+        LocalTime now = LocalTime.now();
+        String currentWeek = LocalDate.now().getDayOfWeek().toString();
 
-    System.out.println("CURRENT TIME = " + currentTime);
-    System.out.println("CURRENT WEEK = " + currentWeek);
+        System.out.println("CURRENT TIME = " + now);
+        System.out.println("CURRENT WEEK = " + currentWeek);
 
-    List<TimeTable> classes =
-            timeTableRepository.findByTimeAndWeek(currentTime, currentWeek);
+        List<TimeTable> classes =
+                timeTableRepository.findByTimeAndWeek(now.toString(), currentWeek);
 
-    System.out.println("CLASSES FOUND = " + classes.size());
+        System.out.println("CLASSES FOUND = " + classes.size());
 
-    if (classes.isEmpty()) {
-        System.out.println("NO CLASS MATCHED ❌");
-        return;
-    }
+        if (classes.isEmpty()) {
+            System.out.println("NO CLASS MATCHED ❌");
+            return "No classes found";
+        }
 
-    for (TimeTable tt : classes) {
+        for (TimeTable tt : classes) {
 
-        System.out.println("CLASS = " + tt.getSubject());
-        System.out.println("BRANCH = " + tt.getBranch());
-        System.out.println("SEMESTER = " + tt.getSemester());
+            List<Student> students =
+                    studentRepository.findByBranchAndSemester(
+                            tt.getBranch(),
+                            tt.getSemester()
+                    );
 
-        List<Student> students =
-                studentRepository.findByBranchAndSemester(
-                        tt.getBranch(),
-                        tt.getSemester()
-                );
+            for (Student student : students) {
 
-        System.out.println("STUDENTS FOUND = " + students.size());
+                if (student.getFcmToken() == null || student.getFcmToken().isEmpty()) {
+                    continue;
+                }
 
-        for (Student student : students) {
+                Message message = Message.builder()
+                        .setToken(student.getFcmToken())
+                        .setNotification(
+                                Notification.builder()
+                                        .setTitle("Class Reminder")
+                                        .setBody(tt.getSubject() + " starts now!")
+                                        .build()
+                        )
+                        .build();
 
-            if (student.getFcmToken() == null || student.getFcmToken().isEmpty()) {
-                continue;
-            }
+                try {
+                    FirebaseMessaging.getInstance().send(message);
+                    System.out.println("SENT TO = " + student.getId());
 
-            Message message = Message.builder()
-                    .setToken(student.getFcmToken())
-                    .setNotification(
-                            Notification.builder()
-                                    .setTitle("Class Reminder")
-                                    .setBody(tt.getSubject() + " starts now!")
-                                    .build()
-                    )
-                    .build();
-
-            try {
-                String response = FirebaseMessaging.getInstance().send(message);
-                System.out.println("FCM RESPONSE = " + response);
-
-            } catch (Exception e) {
-                System.out.println("FAILED FOR STUDENT = " + student.getId());
+                } catch (Exception e) {
+                    System.out.println("FAILED FOR STUDENT = " + student.getId());
+                }
             }
         }
-    }
 
-    System.out.println("NOTIFICATION LOOP COMPLETED ✅");
+        System.out.println("NOTIFICATION COMPLETED ✅");
+        return "Notification process completed";
     }
 }
