@@ -29,7 +29,7 @@ function Notify() {
           vapidKey:
             "BCOu_Siv0g6ymwBgP-OjyeMATDgbkyu66NlALy2kkRrlK3uRqQJYWfBOwBqs65IjN8UlY553TV7JP-DekEWp7T0",
         });
-
+        console.log(token)
         const userEmail = localStorage.getItem("user-email");
 
         await axios.post("http://localhost:8090/student", {
