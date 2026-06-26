@@ -26,77 +26,66 @@ public class NotificationController {
     @Autowired
     private StudentRepository studentRepository;
 
-    @Scheduled(fixedRate = 60000)
-    public void sendNotification() {
+    @Scheduled(cron = "0 * * * * *")
+public void sendNotification() {
 
-        String currentTime = LocalTime.now()
-                .withSecond(0)
-                .withNano(0)
-                .toString();
+    LocalTime now = LocalTime.now().withSecond(0).withNano(0);
+    String currentWeek = LocalDate.now().getDayOfWeek().toString();
+    String currentTime = now.toString();
 
-        String currentWeek = LocalDate.now()
-                .getDayOfWeek()
-                .toString();
+    System.out.println("CURRENT TIME = " + currentTime);
+    System.out.println("CURRENT WEEK = " + currentWeek);
 
-        System.out.println("CURRENT TIME = " + currentTime);
-        System.out.println("CURRENT WEEK = " + currentWeek);
+    List<TimeTable> classes =
+            timeTableRepository.findByTimeAndWeek(currentTime, currentWeek);
 
-        List<TimeTable> classes =
-                timeTableRepository.findByTimeAndWeek(currentTime, currentWeek);
+    System.out.println("CLASSES FOUND = " + classes.size());
 
-        System.out.println("CLASSES FOUND = " + classes.size());
+    if (classes.isEmpty()) {
+        System.out.println("NO CLASS MATCHED ❌");
+        return;
+    }
 
-        if (classes.isEmpty()) {
-            System.out.println("NO CLASS MATCHED ❌");
-            return;
-        }
+    for (TimeTable tt : classes) {
 
-        for (TimeTable tt : classes) {
+        System.out.println("CLASS = " + tt.getSubject());
+        System.out.println("BRANCH = " + tt.getBranch());
+        System.out.println("SEMESTER = " + tt.getSemester());
 
-            System.out.println("CLASS = " + tt.getSubject());
-            System.out.println("BRANCH = " + tt.getBranch());
-            System.out.println("SEMESTER = " + tt.getSemester());
+        List<Student> students =
+                studentRepository.findByBranchAndSemester(
+                        tt.getBranch(),
+                        tt.getSemester()
+                );
 
-            List<Student> students =
-                    studentRepository.findByBranchAndSemester(
-                            tt.getBranch(),
-                            tt.getSemester()
-                    );
+        System.out.println("STUDENTS FOUND = " + students.size());
 
-            System.out.println("STUDENTS FOUND = " + students.size());
+        for (Student student : students) {
 
-            for (Student student : students) {
+            if (student.getFcmToken() == null || student.getFcmToken().isEmpty()) {
+                continue;
+            }
 
-                System.out.println("STUDENT ID = " + student.getId());
-                System.out.println("FCM TOKEN = " + student.getFcmToken());
+            Message message = Message.builder()
+                    .setToken(student.getFcmToken())
+                    .setNotification(
+                            Notification.builder()
+                                    .setTitle("Class Reminder")
+                                    .setBody(tt.getSubject() + " starts now!")
+                                    .build()
+                    )
+                    .build();
 
-                if (student.getFcmToken() == null || student.getFcmToken().isEmpty()) {
-                    System.out.println("SKIPPED DUE TO EMPTY TOKEN");
-                    continue;
-                }
+            try {
+                String response = FirebaseMessaging.getInstance().send(message);
+                System.out.println("FCM RESPONSE = " + response);
 
-                Message message = Message.builder()
-                        .setToken(student.getFcmToken())
-                        .setNotification(
-                                Notification.builder()
-                                        .setTitle("Class Reminder")
-                                        .setBody(tt.getSubject() + " starts now!")
-                                        .build()
-                        )
-                        .build();
-
-                try {
-                    String response =
-                            FirebaseMessaging.getInstance().send(message);
-
-                    System.out.println("FCM RESPONSE = " + response);
-
-                } catch (Exception e) {
-                    System.out.println("FAILED FOR STUDENT = " + student.getId());
-                }
+            } catch (Exception e) {
+                System.out.println("FAILED FOR STUDENT = " + student.getId());
             }
         }
+    }
 
-        System.out.println("NOTIFICATION LOOP COMPLETED ✅");
+    System.out.println("NOTIFICATION LOOP COMPLETED ✅");
     }
 }
