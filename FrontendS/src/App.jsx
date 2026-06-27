@@ -6,6 +6,7 @@ import Auth from "./pages/Auth";
 import ProtectedRoute from "./componenet/ProtectedRoute";
 
 function App() {
+  console.log(Notify);
   return (
     <Routes>
       <Route path="/auth" element={<Auth />} />
