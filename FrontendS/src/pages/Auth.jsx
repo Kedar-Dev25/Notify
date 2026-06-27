@@ -1,20 +1,30 @@
-import { signInWithPopup } from "firebase/auth";
+import { signInWithRedirect, getRedirectResult } from "firebase/auth";
 import { auth, provider } from "../firebase";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Auth() {
-  const handleGoogleLogin = async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
+  const navigate = useNavigate();
 
-      const email = result.user.email;
-
-      localStorage.setItem("user-email", email);
-
-      console.log("Saved Email:", email);
-    } catch (error) {
-      console.error(error);
-    }
+  const handleGoogleLogin = () => {
+    signInWithRedirect(auth, provider);
   };
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      const result = await getRedirectResult(auth);
+
+      if (result) {
+        const email = result.user.email;
+
+        localStorage.setItem("user-email", email);
+
+        navigate("/"); // 🔥 THIS IS THE FIX
+      }
+    };
+
+    checkLogin();
+  }, []);
 
   return (
     <div style={styles.container}>
