@@ -149,7 +149,7 @@ const handleNotify = async () => {
       </div>
     </div>
   );
-}
+
 
 const styles = {
   container: {
