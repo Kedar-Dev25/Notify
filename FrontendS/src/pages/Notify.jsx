@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom"; 
 import axios from "axios"; import { getToken } from "firebase/messaging"; 
 import { messaging } from "../firebase";
+
 function Notify() {
   const navigate = useNavigate();
   const location = useLocation();
