@@ -1,52 +1,54 @@
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { getToken } from "firebase/messaging";
+import React, { useState } from "react"; 
+import { useLocation, useNavigate } from "react-router-dom"; 
+import axios from "axios"; import { getToken } from "firebase/messaging"; 
 import { messaging } from "../firebase";
 
-function Notify() {
-  const location = useLocation();
-  const data = location.state;
 
-  const navigate = useNavigate();
+const handleNotify = async () => {
+  try {
+    setLoading(true);
 
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+    const permission = await Notification.requestPermission();
 
-  const handleNotify = async () => {
-    try {
-      setLoading(true);
-
-      const permission = await Notification.requestPermission();
-
-      if (permission === "granted") {
-        const token = await getToken(messaging, {
-          vapidKey:
-            "BCOu_Siv0g6ymwBgP-OjyeMATDgbkyu66NlALy2kkRrlK3uRqQJYWfBOwBqs65IjN8UlY553TV7JP-DekEWp7T0",
-        });
-
-        const userEmail =
-          localStorage.getItem("user-email");
-
-        await axios.post(
-          "https://notify-x8o4.onrender.com/student",
-          {
-            branch: data.branch,
-            semester: data.semester,
-            fcmToken: token,
-            email: userEmail,
-          }
-        );
-
-        setSuccess(true);
-      }
-
+    if (permission !== "granted") {
+      alert("Please allow notifications to continue");
       setLoading(false);
-    } catch (err) {
-      console.error(err);
-      setLoading(false);
+      return;
     }
-  };
+
+    const token = await getToken(messaging, {
+      vapidKey:
+        "BCOu_Siv0g6ymwBgP-OjyeMATDgbkyu66NlALy2kkRrlK3uRqQJYWfBOwBqs65IjN8UlY553TV7JP-DekEWp7T0",
+    });
+
+    if (!token) {
+      alert("Failed to generate notification token");
+      setLoading(false);
+      return;
+    }
+
+    const userEmail = localStorage.getItem("user-email");
+
+    const res = await axios.post(
+      "https://notify-x8o4.onrender.com/student",
+      {
+        branch: data.branch,
+        semester: data.semester,
+        fcmToken: token,
+        email: userEmail,
+      }
+    );
+
+    console.log("Backend response:", res.data);
+
+    setSuccess(true);
+  } catch (err) {
+    console.error("Notify error:", err);
+    alert("Something went wrong. Check console.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div style={styles.container}>
