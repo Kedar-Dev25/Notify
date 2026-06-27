@@ -46,7 +46,7 @@ const handleNotify = async () => {
   } finally {
     setLoading(false);
   }
-};
+
 
   return (
     <div style={styles.container}>
@@ -147,7 +147,7 @@ const handleNotify = async () => {
       </div>
     </div>
   );
-
+};
 
 const styles = {
   container: {
