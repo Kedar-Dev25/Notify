@@ -11,7 +11,7 @@ const handleNotify = async () => {
     const permission = await Notification.requestPermission();
 
     if (permission !== "granted") {
-      alert("Please allow notifications to continue");
+      alert("Please allow notifications");
       setLoading(false);
       return;
     }
@@ -22,24 +22,22 @@ const handleNotify = async () => {
     });
 
     if (!token) {
-      alert("Failed to generate notification token");
+      alert("Failed to generate FCM token");
       setLoading(false);
       return;
     }
 
     const userEmail = localStorage.getItem("user-email");
 
-    const res = await axios.post(
+    await axios.post(
       "https://notify-x8o4.onrender.com/student",
       {
-        branch: data.branch,
-        semester: data.semester,
+        branch: data?.branch,
+        semester: data?.semester,
         fcmToken: token,
         email: userEmail,
       }
     );
-
-    console.log("Backend response:", res.data);
 
     setSuccess(true);
   } catch (err) {
