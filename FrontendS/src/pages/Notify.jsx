@@ -2,7 +2,13 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom"; 
 import axios from "axios"; import { getToken } from "firebase/messaging"; 
 import { messaging } from "../firebase";
+function Notify() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const data = location.state;
 
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
 const handleNotify = async () => {
   try {
@@ -47,7 +53,7 @@ const handleNotify = async () => {
     setLoading(false);
   }
 
-
+}
   return (
     <div style={styles.container}>
       <div style={styles.backgroundGlow1}></div>
@@ -147,7 +153,7 @@ const handleNotify = async () => {
       </div>
     </div>
   );
-};
+}
 
 const styles = {
   container: {
