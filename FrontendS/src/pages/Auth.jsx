@@ -6,13 +6,13 @@ import { useNavigate } from "react-router-dom";
 function Auth() {
   const navigate = useNavigate();
 
-  const handleGoogleLogin = async () => {
-    try {
-      await signInWithRedirect(auth, provider);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+      const handleGoogleLogin = async () => {
+        try {
+          await signInWithRedirect(auth, provider);
+        } catch (error) {
+          console.log(error);
+        }
+      };
 
   useEffect(() => {
     const checkUser = async () => {

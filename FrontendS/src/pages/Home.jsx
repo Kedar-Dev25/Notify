@@ -14,8 +14,25 @@ function Home() {
   const email = localStorage.getItem("user-email");
   const isAdmin = email === ADMIN_EMAIL;
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.removeItem("user-email");
+      navigate("/auth");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div style={styles.container}>
+      <div>
+      <h1>Home Page</h1>
+
+      <button onClick={handleLogout}>
+        Sign Out
+      </button>
+    </div>
       <div style={styles.overlay}></div>
 
       <div style={styles.contentWrapper}>
@@ -34,7 +51,7 @@ function Home() {
           </h1>
 
           <p style={styles.description}>
-            Configure your branch and semester once.
+            Configure your [branch and semester once.
             Notify automatically sends reminders before
             your lectures so you never miss important classes.
           </p>
@@ -59,7 +76,7 @@ function Home() {
         </div>
 
         {/* RIGHT SIDE */}
-
+        
         <div style={styles.rightSection}>
           <div style={styles.card}>
             <div style={styles.cardGlow}></div>
