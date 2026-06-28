@@ -1,4 +1,4 @@
-import { signInWithRedirect, getRedirectResult } from "firebase/auth";
+import { signInWithRedirect } from "firebase/auth";
 import { auth, provider } from "../firebase";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -14,24 +14,17 @@ function Auth() {
         }
       };
 
-  useEffect(() => {
-    const checkUser = async () => {
-      const result = await getRedirectResult(auth);
+useEffect(() => {
+  const unsub = auth.onAuthStateChanged((user) => {
+    if (user && window.location.pathname !== "/") {
+      localStorage.setItem("user-email", user.email);
+      navigate("/");
+    }
+  });
 
-  console.log("RESULT:", result);
-  console.log("CURRENT USER:", auth.currentUser);
-      if (auth.currentUser) {
-        localStorage.setItem(
-          "user-email",
-          auth.currentUser.email
-        );
+  return unsub;
+}, [navigate]);
 
-        navigate("/");
-      }
-    };
-
-    checkUser();
-  }, [navigate]);
 
   return (
     <div style={styles.container}>
