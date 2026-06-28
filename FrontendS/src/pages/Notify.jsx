@@ -36,15 +36,18 @@ const handleNotify = async () => {
 
     const userEmail = localStorage.getItem("user-email");
 
-    await axios.post(
-      "https://notify-x8o4.onrender.com/student",
-      {
-        branch: data?.branch,
-        semester: data?.semester,
-        fcmToken: token,
-        email: userEmail,
-      }
-    );
+   console.log("Sending...");
+const response = await axios.post(
+  "https://notify-x8o4.onrender.com/student",
+  {
+    branch: data?.branch,
+    semester: data?.semester,
+    fcmToken: token,
+    email: userEmail,
+  }
+);
+
+console.log(response.data);
 
     setSuccess(true);
   } catch (err) {
@@ -125,8 +128,7 @@ const handleNotify = async () => {
             </div>
           </div>
         ) : (
-          <button
-            style={{
+          <button style={{
               ...styles.primaryButton,
               opacity: loading ? 0.7 : 1,
             }}
