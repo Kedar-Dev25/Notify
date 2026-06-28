@@ -16,7 +16,7 @@ function Auth() {
 
 useEffect(() => {
   const unsub = auth.onAuthStateChanged((user) => {
-    if (user && window.location.pathname !== "/") {
+    if (user) {
       localStorage.setItem("user-email", user.email);
       navigate("/");
     }
