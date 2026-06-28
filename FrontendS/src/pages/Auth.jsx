@@ -1,4 +1,4 @@
-import { signInWithRedirect, getRedirectResult } from "firebase/auth";
+import { signInWithPopup} from "firebase/auth";
 import { auth, provider } from "../firebase";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -6,29 +6,19 @@ import { useNavigate } from "react-router-dom";
 function Auth() {
   const navigate = useNavigate();
 
-  const handleGoogleLogin = () => {
-    signInWithRedirect(auth, provider);
-  };
+  const handleGoogleLogin = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
 
- useEffect(() => {
-  const checkLogin = async () => {
-    try {
-      const result = await getRedirectResult(auth);
+    const email = result.user.email;
 
-      console.log("RESULT:", result);
-      console.log("CURRENT USER:", auth.currentUser);
+    localStorage.setItem("user-email", email);
 
-      if (result) {
-        localStorage.setItem("user-email", result.user.email);
-        navigate("/");
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  checkLogin();
-}, [navigate]);
+    navigate("/");
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   return (
     <div style={styles.container}>
