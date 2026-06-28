@@ -10,21 +10,25 @@ function Auth() {
     signInWithRedirect(auth, provider);
   };
 
-  useEffect(() => {
-    const checkLogin = async () => {
+ useEffect(() => {
+  const checkLogin = async () => {
+    try {
       const result = await getRedirectResult(auth);
 
+      console.log("RESULT:", result);
+      console.log("CURRENT USER:", auth.currentUser);
+
       if (result) {
-        const email = result.user.email;
-
-        localStorage.setItem("user-email", email);
-
-        navigate("/"); // 🔥 THIS IS THE FIX
+        localStorage.setItem("user-email", result.user.email);
+        navigate("/");
       }
-    };
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-    checkLogin();
-  }, []);
+  checkLogin();
+}, [navigate]);
 
   return (
     <div style={styles.container}>

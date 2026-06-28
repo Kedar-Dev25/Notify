@@ -27,7 +27,7 @@ const handleNotify = async () => {
       vapidKey:
         "BCOu_Siv0g6ymwBgP-OjyeMATDgbkyu66NlALy2kkRrlK3uRqQJYWfBOwBqs65IjN8UlY553TV7JP-DekEWp7T0",
     });
-
+    console.log(token);
     if (!token) {
       alert("Failed to generate FCM token");
       setLoading(false);
